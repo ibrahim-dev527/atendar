@@ -1,0 +1,17 @@
+#loginView { width: min(520px, 100%); margin: 0 auto; }
+.me-head { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+.me-info { flex: 1; min-width: 220px; }
+.me-info h2 { font-size: 1.7rem; margin-bottom: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 18px 0; }
+.tile { padding: 16px; border-radius: 16px; background: var(--surface); border: 1px solid var(--line); text-align: center; transition: transform .3s var(--ease); }
+.tile:hover { transform: translateY(-4px); }
+.tile b { display: block; font: 800 1.8rem var(--font-head); }
+.tile span { font-size: .75rem; color: var(--muted); text-transform: uppercase; letter-spacing: .08em; }
+.tile.g b { color: var(--green); } .tile.r b { color: var(--red); } .tile.a b { color: var(--amber); } .tile.c b { color: var(--cyan); }
+.fraction { font: 800 1.1rem var(--font-head); margin-top: 10px; }
+.sess { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 14px 4px; border-top: 1px solid var(--line); animation: row-in .5s var(--ease) both; animation-delay: calc(var(--i, 0) * 40ms); }
+.sess:first-child { border-top: 0; }
+.sess b { display: block; }
+.sess small { color: var(--muted); }
+@media (max-width: 640px) { .tiles { grid-template-columns: repeat(2, 1fr); } }

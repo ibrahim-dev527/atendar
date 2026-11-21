@@ -1,0 +1,12 @@
+{
+  "name": "atu-attendance",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Atendar (vanilla HTML/CSS/JS + Supabase). Designed & Developed by Ibratechh.",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "start": "node scripts/dev-server.js",
+    "build": "node scripts/build.js"
+  }
+}

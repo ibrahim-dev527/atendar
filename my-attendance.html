@@ -1,0 +1,41 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>My Attendance · Atendar</title>
+  <meta name="theme-color" content="#070b1a">
+  <meta name="referrer" content="no-referrer">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/logo-192.png">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/mine.css">
+</head>
+<body>
+  <main class="shell" id="app">
+    <header class="topbar reveal">
+      <a class="brand" href="/"><img class="logo" src="/assets/logo-192.png" alt="Atendar logo" width="44" height="44"><span>Atendar<small>My records</small></span></a>
+      <button class="btn small danger hidden" id="logout">🔒 End session</button>
+    </header>
+
+    <section class="narrow-card" id="loginView">
+      <div class="card glow reveal">
+        <h2>My attendance 📊</h2>
+        <p class="muted">Enter your Student ID and the <b>last 4 digits</b> of the WhatsApp number you registered with.</p>
+        <div class="notice bad hidden" id="cfgWarn"><span>🔧</span><span>This site isn't connected to Supabase yet. See the README.</span></div>
+        <form id="loginForm" novalidate>
+          <div class="field"><label for="sid">Student ID</label><input id="sid" class="input" autocomplete="off" autocapitalize="characters" spellcheck="false" maxlength="12" placeholder="Your Student ID"></div>
+          <div class="field"><label for="l4">Last 4 digits of WhatsApp number</label><input id="l4" class="input" type="password" inputmode="numeric" autocomplete="off" maxlength="4" placeholder="••••"></div>
+          <div class="err" id="loginErr" role="alert"></div>
+          <button class="btn primary big" id="loginBtn" type="submit"><span class="lbl">Show my attendance</span></button>
+        </form>
+        <div class="notice warn" style="margin-top:18px"><span>📞</span><span class="recover">If you have lost access to your account or need assistance with registration, please contact the system administrator on 0544823484.</span></div>
+        <p class="hint" style="margin-top:14px">🔒 For your privacy, your session ends automatically after a few minutes of inactivity. Always tap <b>End session</b> on a shared phone.</p>
+      </div>
+    </section>
+
+    <section class="hidden" id="dashView"></section>
+  </main>
+  <script type="module" src="/js/pages/my-attendance.js"></script>
+</body>
+</html>

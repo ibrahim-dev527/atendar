@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Atendar · Smart classroom attendance</title>
+  <meta name="description" content="Fast, secure classroom attendance for Smart classroom attendance.">
+  <meta name="theme-color" content="#070b1a">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/logo-192.png">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/home.css">
+</head>
+<body>
+  <main class="shell" id="app">
+    <header class="topbar reveal">
+      <a class="brand" href="/"><img class="logo" src="/assets/logo-192.png" alt="Atendar logo" width="44" height="44"><span>Atendar<small>Smart classroom attendance</small></span></a>
+      <a class="btn small ghost" href="/admin/login.html">Staff sign in</a>
+    </header>
+
+    <section class="hero">
+      <div class="hero-copy">
+        <span class="eyebrow reveal">🎓 Level 100 Accounting &middot; Built to grow</span>
+        <h1 class="reveal" style="--i:1">Attendance in<br><span class="gradient-text" id="typed">ten seconds</span><span class="caret">|</span></h1>
+        <p class="lead reveal" style="--i:2">Scan the QR code, confirm your name, tap once. No passwords, no paper registers, no queues.</p>
+        <div class="cta reveal" style="--i:3">
+          <a class="btn primary big pulse" href="/register.html"><span class="lbl">✨ Create Account</span></a>
+          <button class="btn big" id="markBtn"><span class="lbl">📲 Mark Attendance</span></button>
+        </div>
+        <a class="my-link reveal" style="--i:4" href="/my-attendance.html">📊 View my attendance history →</a>
+      </div>
+      <div class="hero-art reveal" style="--i:2" aria-hidden="true">
+        <div class="phone float">
+          <div class="phone-top"></div>
+          <div class="phone-card"><span class="live-dot"></span> Session open</div>
+          <div class="phone-qr"></div>
+          <div class="phone-btn">Submit Attendance</div>
+        </div>
+        <div class="orbit o1">✅</div><div class="orbit o2">⏱️</div><div class="orbit o3">📍</div>
+      </div>
+    </section>
+
+    <section class="features">
+      <article class="card lift reveal" style="--i:0"><span class="ficon">⚡</span><h3>One-tap check-in</h3><p class="muted">Open the lecturer's link, type your Student ID, confirm your registered name and you're done.</p></article>
+      <article class="card lift reveal" style="--i:1"><span class="ficon">🛡️</span><h3>Verified by the server</h3><p class="muted">Every submission is checked against the register on the server. Names can't be typed in, and double entries are blocked.</p></article>
+      <article class="card lift reveal" style="--i:2"><span class="ficon">📈</span><h3>Know where you stand</h3><p class="muted">See your attendance rate for every course at any time and spot problems before exams.</p></article>
+    </section>
+
+    <div class="notice warn reveal" id="help"><span>📞</span><span id="helpText">If you have lost access to your account or need assistance with registration, please contact the system administrator on 0544823484.</span></div>
+    <div class="notice bad reveal hidden" id="cfgWarn" style="margin-top:12px"><span>🔧</span><span>This site isn't connected to Supabase yet. Open <b>js/config.js</b> and add your project URL and anon key (see README).</span></div>
+  </main>
+  <script type="module" src="/js/pages/home.js"></script>
+</body>
+</html>

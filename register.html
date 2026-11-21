@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Create Account · Atendar</title>
+  <meta name="theme-color" content="#070b1a">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/logo-192.png">
+  <link rel="stylesheet" href="/css/theme.css">
+</head>
+<body>
+  <main class="shell narrow" id="app">
+    <header class="topbar reveal">
+      <a class="brand" href="/"><img class="logo" src="/assets/logo-192.png" alt="Atendar logo" width="44" height="44"><span>Atendar<small>Create account</small></span></a>
+      <a class="btn small ghost" href="/">← Home</a>
+    </header>
+
+    <section class="card glow reveal" id="formCard">
+      <h2>Create your account ✨</h2>
+      <p class="muted">Takes under a minute. No email or password needed. Your Student ID is your key.</p>
+      <div class="notice bad hidden" id="cfgWarn"><span>🔧</span><span>This site isn't connected to Supabase yet. See the README.</span></div>
+
+      <form id="regForm" novalidate autocomplete="off">
+        <div class="field"><label for="fullName">Full name</label>
+          <input id="fullName" class="input" placeholder="e.g. Ama Serwaa Mensah" maxlength="120" autocomplete="name"><div class="err" data-for="fullName"></div></div>
+        <div class="row">
+          <div class="field"><label for="studentId">Student ID</label>
+            <input id="studentId" class="input" placeholder="e.g. 01244542B" maxlength="12" autocapitalize="characters" spellcheck="false"><div class="err" data-for="studentId"></div></div>
+          <div class="field"><label for="whatsapp">WhatsApp number</label>
+            <input id="whatsapp" class="input" placeholder="0244 123 456" inputmode="tel" maxlength="20"><div class="err" data-for="whatsapp"></div></div>
+        </div>
+        <div class="row">
+          <div class="field"><label for="programme">Programme</label><select id="programme" class="input"><option value="">Loading…</option></select><div class="err" data-for="programme"></div></div>
+          <div class="field"><label for="level">Academic level</label><select id="level" class="input"><option value="">Loading…</option></select><div class="err" data-for="level"></div></div>
+        </div>
+        <div class="field"><label for="group">Class / group</label><select id="group" class="input" disabled><option value="">Choose programme and level first</option></select>
+          <div class="err" data-for="group"></div><div class="hint" id="groupHint"></div></div>
+        <div class="err" id="formErr" role="alert"></div>
+        <button class="btn primary big" id="submit" type="submit"><span class="lbl">Create my account</span></button>
+      </form>
+      <div class="notice warn" style="margin-top:18px"><span>📞</span><span class="recover">If you have lost access to your account or need assistance with registration, please contact the system administrator on 0544823484.</span></div>
+    </section>
+
+    <section class="card glow hidden" id="doneCard" style="text-align:center">
+      <svg class="check" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30"/><path d="M26 41l10 10 19-22"/></svg>
+      <h2>You're registered! 🎉</h2>
+      <p id="doneMsg" class="muted"></p>
+      <div class="notice good" style="text-align:left;margin:14px 0"><span>💡</span><span>Keep your <b>Student ID</b> handy. You'll type it each time you mark attendance. Your account is active now.</span></div>
+      <div style="display:grid;gap:10px">
+        <a class="btn primary" href="/my-attendance.html"><span class="lbl">📊 Go to my attendance</span></a>
+        <a class="btn" href="/">🏠 Back to home</a>
+      </div>
+    </section>
+  </main>
+  <script type="module" src="/js/pages/register.js"></script>
+</body>
+</html>

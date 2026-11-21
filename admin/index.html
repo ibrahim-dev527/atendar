@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Admin · Atendar</title>
+  <meta name="robots" content="noindex">
+  <meta name="referrer" content="no-referrer">
+  <meta name="theme-color" content="#070b1a">
+  <link rel="icon" href="/assets/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/assets/logo-192.png">
+  <link rel="stylesheet" href="/css/theme.css">
+  <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body class="admin">
+  <aside class="sidebar" id="sidebar" aria-label="Main navigation">
+    <a class="brand" href="/admin/index.html"><img class="logo" src="/assets/logo-192.png" alt="Atendar logo" width="44" height="44"><span>Atendar<small>Admin console</small></span></a>
+    <nav class="nav" id="nav"></nav>
+    <div class="side-foot">
+      <div class="who" id="who">…</div><div id="roleLabel"></div>
+      <button class="btn small danger" id="signout" style="margin-top:10px;width:100%">Sign out</button>
+    </div>
+  </aside>
+  <div class="scrim" id="scrim"></div>
+  <main class="main" id="main">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+      <button class="btn small menu-btn" id="menuBtn" aria-label="Open menu">☰ Menu</button>
+    </div>
+    <div id="view"><div class="skeleton" style="height:140px"></div></div>
+  </main>
+  <script type="module" src="/js/admin/app.js"></script>
+</body>
+</html>
