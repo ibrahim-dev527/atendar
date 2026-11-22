@@ -46,10 +46,15 @@ export function renderFooter(container = document.body) {
   if ($(".site-footer")) return;
   const f = document.createElement("footer");
   f.className = "site-footer reveal";
+  const wa = "https://wa.me/233544823484?text=" + encodeURIComponent("Hello Ibrahim, I'm contacting you from the Atendar attendance platform (powered by Ibratechh). I need some help / have an enquiry.");
   f.innerHTML = `
     <div class="dev">
-      <img class="dev-photo" src="/assets/developer.jpg" alt="Photo of the developer" width="72" height="72" loading="lazy">
-      <span>Powered by <a href="https://ibratechh.com" target="_blank" rel="noopener noreferrer">Ibratechh</a></span>
+      <img class="dev-photo" src="/assets/developer.jpg" alt="Photo of Ibrahim Mohammed Lotsu" width="72" height="72" loading="lazy">
+      <div class="dev-text">
+        <span>Powered by <a href="https://ibratechh.com" target="_blank" rel="noopener noreferrer">Ibratechh</a></span>
+        <span class="dev-name">Ibrahim Mohammed Lotsu &middot; ATUAS PRO</span>
+        <a class="dev-wa" href="${wa}" target="_blank" rel="noopener noreferrer" aria-label="Message Ibrahim on WhatsApp">💬 WhatsApp 0544823484</a>
+      </div>
     </div>
     <span>&middot; Atendar &copy; ${new Date().getFullYear()}</span>`;
   container.appendChild(f);
@@ -230,4 +235,30 @@ export function emptyState(icon, title, text = "") { return `<div class="empty">
 export function statusBadge(status) {
   const map = { present: "good", late: "warn", excused: "info", absent: "bad", active: "good", inactive: "bad", open: "good", scheduled: "info", closed: "warn", expired: "bad" };
   return `<span class="badge ${map[status] || ""}">${esc(status)}</span>`;
+}
+
+
+/* Big "welcome" popup: balloons float up while confetti bursts. Respects reduced motion. */
+export function celebrate({ name = "", studentId = "" } = {}) {
+  const ov = document.createElement("div");
+  ov.className = "overlay celebrate";
+  const colors = ["#7c5cff", "#22d3ee", "#34d399", "#fbbf24", "#ff5c8a", "#fb923c"];
+  const balloons = reduceMotion() ? "" : Array.from({ length: 22 }, (_, i) => {
+    const c = colors[i % colors.length], left = 3 + ((i * 97) % 94), size = 46 + ((i * 13) % 30), dur = 5 + ((i * 7) % 40) / 10, delay = ((i * 11) % 18) / 10;
+    return `<i class="balloon" style="left:${left}%;width:${size}px;height:${(size * 1.22).toFixed(0)}px;background:radial-gradient(circle at 32% 28%, #fff9 0 12%, transparent 13%), ${c};animation-duration:${dur}s;animation-delay:${delay}s"></i>`;
+  }).join("");
+  ov.innerHTML = `${balloons}<div class="modal celebrate-card" role="dialog" aria-modal="true" aria-label="Registration successful">
+      <div class="celebrate-emoji" aria-hidden="true">🎉🎈🥳</div>
+      <h2>Congratulations${name ? ", " + esc(name.split(" ")[0]) : ""}!</h2>
+      <p class="muted">You are now registered on <b>Atendar</b>${studentId ? ` with Student ID <b>${esc(studentId)}</b>` : ""}. You can mark your attendance whenever your lecturer starts a session.</p>
+      <button class="btn primary big" data-close><span class="lbl">Let's go 🚀</span></button></div>`;
+  document.body.appendChild(ov);
+  const close = () => { document.removeEventListener("keydown", onKey); ov.classList.add("out"); setTimeout(() => ov.remove(), 250); };
+  const onKey = (e) => { if (e.key === "Escape") close(); };
+  document.addEventListener("keydown", onKey);
+  ov.querySelector("[data-close]").addEventListener("click", close);
+  ov.addEventListener("pointerdown", (e) => { if (e.target === ov) close(); });
+  confetti(3200); setTimeout(() => confetti(2800), 900); setTimeout(() => confetti(2600), 1900);
+  setTimeout(() => ov.querySelector("[data-close]")?.focus?.(), 80);
+  setTimeout(() => ov.querySelectorAll(".balloon").forEach((b) => b.remove()), 12000);
 }

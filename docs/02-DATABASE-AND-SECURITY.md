@@ -71,3 +71,7 @@ Notable protections:
 5. Ghana numbers only (02x/05x mobile, 03x). Student IDs must be 6-10 digits plus an optional letter (e.g. 01244542B).
 6. Staff `SELECT` on `students` must name columns; `select *` is denied by design.
 7. Reopening a session keeps its original `opens_at`, so if `late_after_minutes` is set, submissions after a reopen are marked late.
+
+
+---
+**Update 2026-11-22:** `class_groups` is presented as **Classes** (a programme has many classes, each with a level; students pick programme then class; courses belong to a class). `student_login(student_id)` now needs only the Student ID. Starter data: programme *Accounting and Finance Analytics*, class *BTech Accounting and Finance Analytics Lvl 100*.

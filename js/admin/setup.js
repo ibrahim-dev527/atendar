@@ -5,10 +5,10 @@ import { loadLookups, options, nameOf } from "/js/admin/common.js";
 export async function mount(ctx, root) {
   const { sb, role } = ctx;
   const isSuper = role === "super_admin";
-  let L = await loadLookups(sb), tab = "groups", settings = [];
-  const TABS = [["groups", "Class groups"], ["programmes", "Programmes"], ["levels", "Academic levels"], ["periods", "Academic periods"], ["settings", "Settings"]];
+  let L = await loadLookups(sb), tab = "programmes", settings = [];
+  const TABS = [["programmes", "Programmes"], ["groups", "Classes"], ["levels", "Academic levels"], ["periods", "Academic periods"], ["settings", "Settings"]];
 
-  root.innerHTML = `<div class="page-head reveal"><div><h1>Setup</h1><p>The building blocks the whole system grows from: programmes, levels, groups and periods.</p></div></div>
+  root.innerHTML = `<div class="page-head reveal"><div><h1>Setup</h1><p>The building blocks the whole system grows from: programmes, the classes under each programme, levels and periods.</p></div></div>
     <div class="tabs reveal" id="tabs">${TABS.map(([k, l]) => `<button class="tab" data-tab="${k}">${l}</button>`).join("")}</div>
     <div class="card reveal" id="panel"></div>`;
   initReveal();
@@ -23,13 +23,13 @@ export async function mount(ctx, root) {
     $$("#tabs .tab", root).forEach((b) => b.classList.toggle("active", b.dataset.tab === tab));
     const p = $("#panel", root);
     if (tab === "groups") {
-      p.innerHTML = `<h3>Class groups</h3><p class="muted">Students pick one of these when they register. Add every group for each programme and level.</p>
-        <form class="toolbar" id="addf"><select id="g_p" class="input">${options(L.programmes, { placeholder: "Programme" })}</select><select id="g_l" class="input">${options(L.levels, { placeholder: "Level" })}</select><input id="g_n" class="input" placeholder="Group name, e.g. Group A" maxlength="40"><button class="btn primary">Add group</button></form>
-        ${table(["Programme", "Level", "Group", "Status", ""], L.groups.map((g) => [esc(nameOf(L.programmes, g.programme_id)), esc(nameOf(L.levels, g.level_id)), `<b>${esc(g.name)}</b>`, statusBadge(g.is_active ? "active" : "inactive"), tog("class_groups", g)]))}`;
-      $("#addf", root).addEventListener("submit", (e) => { e.preventDefault(); const row = { programme_id: val("g_p"), level_id: val("g_l"), name: val("g_n") }; if (!row.programme_id || !row.level_id || row.name.length < 1) return toast("Choose a programme and level, and name the group.", "bad"); save(sb.from("class_groups").insert(row), "Group added."); });
+      p.innerHTML = `<h3>Classes</h3><p class="muted">A programme can have many classes (for example BTech, HND and Diploma, each at Level 100 to 400). Students choose their class when they register, and courses and attendance belong to a class. Give each class its full name, e.g. <i>BTech Accounting and Finance Analytics Lvl 100</i>.</p>
+        <form class="toolbar" id="addf"><select id="g_p" class="input">${options(L.programmes, { placeholder: "Programme" })}</select><select id="g_l" class="input">${options(L.levels, { placeholder: "Level of this class" })}</select><input id="g_n" class="input" placeholder="Full class name" maxlength="120" style="flex:2 1 280px"><button class="btn primary">Add class</button></form>
+        ${table(["Programme", "Class", "Level", "Status", ""], L.groups.map((g) => [esc(nameOf(L.programmes, g.programme_id)), `<b>${esc(g.name)}</b>`, esc(nameOf(L.levels, g.level_id)), statusBadge(g.is_active ? "active" : "inactive"), `<div class="actions-cell"><button class="btn small" data-ren="class_groups" data-id="${esc(g.id)}" data-name="${esc(g.name)}">✏️ Rename</button>${tog("class_groups", g)}</div>`]))}`;
+      $("#addf", root).addEventListener("submit", (e) => { e.preventDefault(); const row = { programme_id: val("g_p"), level_id: val("g_l"), name: val("g_n") }; if (!row.programme_id || !row.level_id || row.name.length < 2) return toast("Choose the programme and level, and type the full class name.", "bad"); save(sb.from("class_groups").insert(row), "Class added."); });
     } else if (tab === "programmes") {
-      p.innerHTML = `<h3>Programmes</h3><form class="toolbar" id="addf"><input id="p_c" class="input" placeholder="Code, e.g. ACC" maxlength="12" style="text-transform:uppercase"><input id="p_n" class="input" placeholder="Programme name" maxlength="80"><input id="p_d" class="input" placeholder="Department (optional)" maxlength="80"><button class="btn primary">Add programme</button></form>
-        ${table(["Code", "Programme", "Department", "Status", ""], L.programmes.map((x) => [`<b>${esc(x.code)}</b>`, esc(x.name), esc(x.department || ""), statusBadge(x.is_active ? "active" : "inactive"), tog("programmes", x)]))}`;
+      p.innerHTML = `<h3>Programmes</h3><form class="toolbar" id="addf"><input id="p_c" class="input" placeholder="Code, e.g. ACC" maxlength="12" style="text-transform:uppercase"><input id="p_n" class="input" placeholder="Programme name, e.g. Accounting and Finance Analytics" maxlength="80" style="flex:2 1 280px"><input id="p_d" class="input" placeholder="Department (optional)" maxlength="80"><button class="btn primary">Add programme</button></form>
+        ${table(["Code", "Programme", "Department", "Status", ""], L.programmes.map((x) => [`<b>${esc(x.code)}</b>`, esc(x.name), esc(x.department || ""), statusBadge(x.is_active ? "active" : "inactive"), `<div class="actions-cell"><button class="btn small" data-ren="programmes" data-id="${esc(x.id)}" data-name="${esc(x.name)}">✏️ Rename</button>${tog("programmes", x)}</div>`]))}`;
       $("#addf", root).addEventListener("submit", (e) => { e.preventDefault(); const row = { code: val("p_c").toUpperCase(), name: val("p_n"), department: val("p_d") || null }; if (!row.code || !row.name) return toast("Enter a code and a name.", "bad"); save(sb.from("programmes").insert(row), "Programme added."); });
     } else if (tab === "levels") {
       p.innerHTML = `<h3>Academic levels</h3><form class="toolbar" id="addf"><input id="l_n" type="number" min="100" max="900" step="100" class="input" placeholder="Number, e.g. 500"><input id="l_t" class="input" placeholder="Name, e.g. Level 500" maxlength="40"><button class="btn primary">Add level</button></form>
@@ -44,6 +44,11 @@ export async function mount(ctx, root) {
     } else {
       renderSettings(p); return;
     }
+    $$("[data-ren]", root).forEach((b) => b.addEventListener("click", () => {
+      const nn = (window.prompt("New name:", b.dataset.name) || "").trim();
+      if (nn.length < 2 || nn === b.dataset.name) return;
+      save(sb.from(b.dataset.ren).update({ name: nn }).eq("id", b.dataset.id), "Renamed.");
+    }));
     $$("[data-tog]", root).forEach((b) => b.addEventListener("click", () => toggle(b.dataset.table, b.dataset.tog, b.dataset.on === "1")));
   }
 

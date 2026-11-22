@@ -19,8 +19,7 @@ export async function mount(ctx, root) {
       <div class="toolbar" style="margin:0">
         <select id="fCourse" class="input"><option value="">All courses</option>${(courseList || []).map((c) => `<option value="${esc(c.id)}">${esc(c.code)} · ${esc(c.name)}</option>`).join("")}</select>
         <select id="fProg" class="input">${options(L.programmes, { placeholder: "All programmes" })}</select>
-        <select id="fLevel" class="input">${options(L.levels, { placeholder: "All levels" })}</select>
-        <select id="fGroup" class="input">${options(L.groups, { placeholder: "All groups" })}</select>
+        <select id="fGroup" class="input">${options(L.groups, { placeholder: "All classes" })}</select>
         <select id="fPeriod" class="input">${options(L.periods, { placeholder: "Any academic period" })}</select>
         <label class="muted" style="display:flex;gap:6px;align-items:center">From <input id="fFrom" type="date" class="input"></label>
         <label class="muted" style="display:flex;gap:6px;align-items:center">To <input id="fTo" type="date" class="input"></label>
@@ -127,7 +126,7 @@ export async function mount(ctx, root) {
   const exportSession = (sid, fmt) => guard(async () => { const l = filtered().filter((r) => r.sid === sid), ps = perSession(l), s = ps[0]; if (!s) return; await exportTable({ format: fmt, title: `${s.code} · ${s.title}`, subtitle: `${s.course} · ${fmtDate(s.date)}`, summary: [["Enrolled", s.n], ["Present", s.present], ["Late", s.late], ["Excused", s.excused], ["Absent", s.finished ? s.absent : "open"], ["Rate", s.rate == null ? "–" : s.rate + "%"]], columns: detCols, rows: detRows(l), filename: `session_${s.code}_${s.date}` }); });
 
   // ------------------------------------------------------------------ filter wiring
-  const map = { fCourse: "course", fProg: "programme", fLevel: "level", fGroup: "group", fPeriod: "period", fFrom: "from", fTo: "to", fStatus: "status" };
+  const map = { fCourse: "course", fProg: "programme", fGroup: "group", fPeriod: "period", fFrom: "from", fTo: "to", fStatus: "status" };
   Object.entries(map).forEach(([id, k]) => $("#" + id, root).addEventListener("change", (e) => { F[k] = e.target.value; (k === "status" ? (page = 0, render) : build)(); }));
   $("#fStudent", root).addEventListener("input", debounce((e) => { F.student = e.target.value.trim(); page = 0; render(); }, 250));
   $("#clear", root).addEventListener("click", () => { Object.keys(F).forEach((k) => (F[k] = "")); $$("select.input,input.input", root).forEach((i) => (i.value = "")); build(); });

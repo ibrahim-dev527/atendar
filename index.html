@@ -9,7 +9,41 @@
   <link rel="icon" href="/assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="/assets/logo-192.png">
   <link rel="stylesheet" href="/css/theme.css">
-  <link rel="stylesheet" href="/css/home.css">
+  <style>
+.hero { display: grid; grid-template-columns: 1.15fr .85fr; gap: 30px; align-items: center; padding: 18px 0 34px; }
+.eyebrow { display: inline-block; padding: 7px 14px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font: 600 .82rem var(--font); color: #cfd5ff; margin-bottom: 18px; }
+.hero h1 { font-size: clamp(2.3rem, 7vw, 4.2rem); font-weight: 800; margin-bottom: 18px; min-height: 2.3em; }
+.caret { color: var(--cyan); animation: blink 1s steps(1) infinite; margin-left: 2px; font-weight: 300; }
+@keyframes blink { 50% { opacity: 0; } }
+.lead { font-size: 1.1rem; color: var(--muted); max-width: 520px; margin-bottom: 26px; }
+.cta { display: grid; gap: 12px; max-width: 420px; }
+.my-link { display: inline-block; margin-top: 20px; font-weight: 600; }
+.hero-art { position: relative; min-height: 400px; display: grid; place-items: center; }
+.phone { width: 230px; padding: 16px; border-radius: 34px; background: linear-gradient(160deg, #1b2358, #0c1230); border: 1px solid rgba(255,255,255,.18);
+  box-shadow: 0 40px 90px rgba(80, 60, 255, .35), inset 0 0 0 6px rgba(255,255,255,.03); display: grid; gap: 14px; justify-items: center; }
+.phone-top { width: 70px; height: 6px; border-radius: 6px; background: rgba(255,255,255,.2); }
+.phone-card { width: 100%; padding: 10px 12px; border-radius: 14px; background: rgba(52,211,153,.12); border: 1px solid rgba(52,211,153,.35); font: 600 .8rem var(--font); display: flex; gap: 8px; align-items: center; }
+.phone-qr { width: 130px; height: 130px; border-radius: 14px; background: #fff;
+  background-image: conic-gradient(#0b1030 25%, #fff 0 50%, #0b1030 0 75%, #fff 0); background-size: 26px 26px; position: relative; overflow: hidden; }
+.phone-qr::after { content: ""; position: absolute; left: 0; right: 0; height: 4px; background: var(--cyan); box-shadow: 0 0 18px 4px var(--cyan); animation: scan 2.4s ease-in-out infinite alternate; }
+@keyframes scan { from { top: 0; } to { top: calc(100% - 4px); } }
+.phone-btn { width: 100%; text-align: center; padding: 12px; border-radius: 14px; background: var(--grad); color: #07102a; font: 700 .85rem var(--font); }
+.orbit { position: absolute; width: 54px; height: 54px; border-radius: 16px; display: grid; place-items: center; font-size: 1.5rem; background: var(--surface-2); border: 1px solid var(--line); backdrop-filter: blur(8px); box-shadow: var(--shadow); }
+.o1 { top: 8%; left: 6%; animation: floaty 4s ease-in-out infinite; }
+.o2 { bottom: 12%; left: 2%; animation: floaty 5s ease-in-out -1s infinite; }
+.o3 { top: 20%; right: 2%; animation: floaty 4.5s ease-in-out -2s infinite; }
+.features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 24px; }
+.ficon { width: 52px; height: 52px; display: grid; place-items: center; font-size: 1.6rem; border-radius: 16px; background: var(--surface-2); border: 1px solid var(--line); margin-bottom: 14px; transition: transform .4s var(--ease); }
+.card:hover .ficon { transform: rotate(-10deg) scale(1.12); }
+.features h3 { font-size: 1.1rem; }
+.features p { margin: 0; font-size: .92rem; }
+@media (max-width: 860px) {
+  .hero { grid-template-columns: 1fr; }
+  .hero-art { min-height: 340px; order: -1; }
+  .features { grid-template-columns: 1fr; }
+  .hero h1 { min-height: 0; }
+}
+  </style>
 </head>
 <body>
   <main class="shell" id="app">

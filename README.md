@@ -28,12 +28,16 @@ Local preview: `npm start` → http://localhost:3000
 Import the folder/repo. `vercel.json` already sets the build command (`node scripts/build.js`), output (`dist`) and security headers. Add the two env vars, deploy.
 Then in Supabase **Authentication → URL Configuration** set the Site URL to your Vercel URL.
 
+## Updating a project that already ran an older setup.sql
+
+Run `supabase/update_2026-11-22.sql` once in the SQL Editor (safe to re-run). New projects only need `setup.sql`.
+
 ## 4. First use
 
 1. Sign in at `/admin/login.html`.
 2. **Students → Add student** lets you register students yourself (no WhatsApp OTP needed); they are enrolled in matching courses automatically.
-3. **Setup**: rename the placeholder "Group A" / add your real programmes, levels, class groups, periods.
-3. **Courses**: add courses; **Enrolments**: they auto-fill from matching registrations (or enrol manually).
+3. **Setup**: a first programme (Accounting and Finance Analytics) and class (BTech Accounting and Finance Analytics Lvl 100) are pre-loaded. Add more under **Setup → Programmes** and **Setup → Classes**: a programme has many classes (BTech, HND, Diploma, Level 100-400), and each class has a level.
+3. **Courses**: add courses (pick the programme, then the class); **Enrolments**: they auto-fill from matching registrations (or enrol manually).
 4. Share `/register.html` with students. Students register themselves.
 5. **Sessions → New session → Start**. Share the link / show the QR. **Students can register at any time, even while a session is running: they join that session's class list automatically, so totals always add up. Sessions that have already closed are never changed.
 
@@ -44,7 +48,7 @@ Optional: invite more staff from the dashboard by deploying the Edge Function:
 
 - **A Student ID is not a secret.** Classmates who know it could try to mark someone present. Controls: roster check, device deterrent, optional attendance code, short windows, audit trail, admin overrides. **This system reduces proxy attendance; it cannot eliminate it.**
 - The one-device-per-session check is a **deterrent**: clearing browser data, another browser or a different phone bypasses it.
-- Student dashboard sign-in (ID + last 4 WhatsApp digits) is weak by design: it stops casual snooping only.
+- Student dashboard sign-in uses the Student ID only (by request), so anyone who knows a classmate's ID can view that classmate's attendance summary (name, class, attendance rate; no phone number). Sessions last 30 minutes and are revocable.
 - Rate limits are per IP; campus Wi-Fi shares IPs, so limits are generous (tunable in `app_settings`).
 - Student ID format: 6-10 digits plus an optional letter (e.g. 01244542B). If some IDs differ, the pattern is in `001_schema.sql`/`002_functions.sql` and `js/validators.js`.
 - Excused sessions are excluded from the attendance-rate denominator.

@@ -67,9 +67,9 @@ declare ad uuid := t.get('ad')::uuid; lec uuid := t.get('lec')::uuid; rep uuid :
         p uuid; l uuid; g uuid; c1 uuid; c2 uuid;
 begin
   perform t.staff(ad);
-  select id into p from public.programmes where code='ACC';
+  select id into p from public.programmes where code='AFA';
   select id into l from public.academic_levels where level_number=100;
-  select id into g from public.class_groups where name='Group A';
+  select id into g from public.class_groups where name like 'BTech%Lvl 100';
   insert into public.courses (code,name,programme_id,level_id,class_group_id) values ('ACC101','Financial Accounting I',p,l,g) returning id into c1;
   insert into public.courses (code,name,programme_id,level_id,class_group_id) values ('ACC102','Business Math',p,l,g) returning id into c2;
   insert into public.course_assignments (course_id,user_id,assignment_role) values (c1,lec,'lecturer'),(c1,rep,'course_rep'),(c2,lec2,'lecturer');
@@ -335,12 +335,10 @@ do $$
 declare r jsonb; tok text; i int;
 begin
   perform t.anon('9.9.9.9');
-  r := public.student_login('01241001A','0000');
-  perform t.ok(r->>'code'='BAD_CREDENTIALS', 'wrong last-4 rejected');
-  r := public.student_login('NOPE0000','3456');
-  perform t.ok(r->>'code'='BAD_CREDENTIALS', 'unknown ID gives identical error (no enumeration)');
-  r := public.student_login('01241001A','3456');
-  perform t.ok(r->>'ok'='true' and length(r->>'token')=64, 'correct ID + last 4 digits issues random token');
+  r := public.student_login('99999999Z');
+  perform t.ok(r->>'code'='BAD_CREDENTIALS', 'unknown Student ID rejected');
+  r := public.student_login('01241001A');
+  perform t.ok(r->>'ok'='true' and length(r->>'token')=64, 'Student ID alone signs in and issues a random token');
   tok := r->>'token';
   r := public.student_dashboard(tok);
   perform t.ok(r->'student'->>'full_name'='Ama Mensah' and r->'stats'->>'summary'='6/7', 'student sees own dashboard across all their courses (6/7)');
@@ -351,9 +349,9 @@ begin
   perform t.root();
   perform t.ok((select count(*) from public.student_access_tokens where token_hash = tok) = 0, 'raw token is never stored (hash only)');
   perform t.anon('8.8.8.8');
-  for i in 1..6 loop perform public.student_login('01241002A','0000'); end loop;
-  r := public.student_login('01241002A','3484');
-  perform t.ok(r->>'code'='RATE_LIMITED', 'brute-force on one Student ID is throttled even with the right digits');
+  for i in 1..30 loop perform public.student_login('01241002A'); end loop;
+  r := public.student_login('01241002A');
+  perform t.ok(r->>'code'='RATE_LIMITED', 'hammering one Student ID is throttled');
 end $$;
 
 -- -------------------------------------------------------------- rate limits

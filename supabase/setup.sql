@@ -1254,23 +1254,22 @@ end $$;
 -- registered WhatsApp number -> short-lived revocable token.
 -- WEAK second factor by design; documented in the README.
 -- ----------------------------------------------------------------------------
-create or replace function public.student_login(p_student_id text, p_last4 text)
+create or replace function public.student_login(p_student_id text)
 returns jsonb language plpgsql security definer set search_path = '' as $$
 declare
   v_sid text := public.normalize_student_id(p_student_id);
   st public.students; v_token text;
   v_bad jsonb := jsonb_build_object('ok', false, 'code', 'BAD_CREDENTIALS',
-    'message', 'We could not match that Student ID and phone number. Check them and try again, or contact the system administrator.');
+    'message', 'We could not find an active student with that Student ID. Check it and try again, or contact the system administrator.');
 begin
   if not public._rate_ok('login_client', public._client_key(),
         public._setting('rl_login_max', '300')::int, 900)
-     or not public._rate_ok('login_sid', v_sid, 6, 900) then
+     or not public._rate_ok('login_sid', v_sid, 30, 900) then
     return jsonb_build_object('ok', false, 'code', 'RATE_LIMITED',
       'message', 'Too many attempts. Please wait 15 minutes or contact the system administrator.');
   end if;
   select * into st from public.students where student_id = v_sid;
-  if not found or st.status <> 'active' or coalesce(p_last4, '') !~ '^[0-9]{4}$'
-     or right(st.whatsapp_number, 4) <> p_last4 then
+  if not found or st.status <> 'active' then
     return v_bad;
   end if;
   v_token := encode(extensions.gen_random_bytes(32), 'hex');
@@ -1512,7 +1511,7 @@ grant execute on function
   public.get_session_public(text),
   public.lookup_student_for_session(text, text),
   public.submit_attendance(text, text, text, text),
-  public.student_login(text, text),
+  public.student_login(text),
   public.student_dashboard(text),
   public.student_logout(text)
 to anon, authenticated;
@@ -1576,18 +1575,18 @@ insert into public.app_settings (key, value) values
 on conflict (key) do nothing;
 
 insert into public.programmes (code, name, department) values
-  ('ACC', 'Accounting', 'Accounting and Finance')
+  ('AFA', 'Accounting and Finance Analytics', 'Accounting and Finance')
 on conflict (code) do nothing;
 
 insert into public.academic_levels (level_number, name) values
   (100, 'Level 100'), (200, 'Level 200'), (300, 'Level 300'), (400, 'Level 400')
 on conflict (level_number) do nothing;
 
--- Placeholder group so registration works on day one. Rename it or add your
--- real class groups in the dashboard before sharing the registration link.
+-- First class, so registration works on day one. Add more programmes and classes
+-- (BTech / HND / Diploma, Level 100-400) in Admin -> Setup.
 insert into public.class_groups (programme_id, level_id, name)
-select p.id, l.id, 'Group A'
+select p.id, l.id, 'BTech Accounting and Finance Analytics Lvl 100'
 from public.programmes p, public.academic_levels l
-where p.code = 'ACC' and l.level_number = 100
+where p.code = 'AFA' and l.level_number = 100
 on conflict do nothing;
 

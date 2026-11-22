@@ -175,7 +175,7 @@ grant execute on function
   public.get_session_public(text),
   public.lookup_student_for_session(text, text),
   public.submit_attendance(text, text, text, text),
-  public.student_login(text, text),
+  public.student_login(text),
   public.student_dashboard(text),
   public.student_logout(text)
 to anon, authenticated;

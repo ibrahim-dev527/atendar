@@ -32,7 +32,7 @@ export async function mount(ctx, root) {
     if (!list.length) { box.innerHTML = emptyState("📚", isAdmin ? "No courses yet" : "No courses assigned to you yet", isAdmin ? "Add your first course to start taking attendance." : "Ask an administrator to assign you to a course."); return; }
     box.innerHTML = `<div class="table-wrap"><table class="tbl"><thead><tr><th>Code</th><th>Course</th><th>Class</th><th>Staff</th><th>Enrolled</th><th>Status</th>${isAdmin ? "<th></th>" : ""}</tr></thead><tbody>
       ${list.map((c, i) => `<tr style="--i:${i}"><td><b>${esc(c.code)}</b></td><td>${esc(c.name)}</td>
-        <td><span class="muted">${esc(nameOf(L.programmes, c.programme_id))} · ${esc(nameOf(L.levels, c.level_id))} · ${esc(c.class_group_id ? nameOf(L.groups, c.class_group_id) : "All groups")}</span>${c.academic_period_id ? `<br><small class="muted">${esc(nameOf(L.periods, c.academic_period_id))}</small>` : ""}</td>
+        <td><span class="muted">${esc(nameOf(L.programmes, c.programme_id))} · ${esc(c.class_group_id ? nameOf(L.groups, c.class_group_id) : "All classes (" + nameOf(L.levels, c.level_id) + ")")}</span>${c.academic_period_id ? `<br><small class="muted">${esc(nameOf(L.periods, c.academic_period_id))}</small>` : ""}</td>
         <td>${c.course_assignments.length ? c.course_assignments.map((a) => `<span class="badge ${a.assignment_role === "lecturer" ? "info" : "warn"}" title="${esc(a.profiles?.email)}">${a.assignment_role === "lecturer" ? "👨‍🏫" : "🧑‍🎓"} ${esc(a.profiles?.full_name || a.profiles?.email || "Staff")}</span>`).join(" ") : '<span class="muted">None</span>'}</td>
         <td><b>${counts.get(c.id) || 0}</b></td><td>${c.is_archived ? '<span class="badge warn">archived</span>' : statusBadge("active")}</td>
         ${isAdmin ? `<td><div class="actions-cell"><button class="btn small" data-a="enrol" data-id="${esc(c.id)}">👥 Enrolments</button><button class="btn small" data-a="staff" data-id="${esc(c.id)}">🧑‍🏫 Staff</button><button class="btn small" data-a="edit" data-id="${esc(c.id)}">✏️</button><button class="btn small" data-a="arch" data-id="${esc(c.id)}">${c.is_archived ? "♻️ Restore" : "📦 Archive"}</button><button class="btn small danger" data-a="del" data-id="${esc(c.id)}">🗑️</button></div></td>` : ""}</tr>`).join("")}
@@ -66,28 +66,28 @@ export async function mount(ctx, root) {
         <div class="row"><div class="field"><label for="c_code">Course code</label><input id="c_code" class="input" maxlength="20" placeholder="ACC101" value="${esc(c?.code ?? "")}" style="text-transform:uppercase"></div>
           <div class="field"><label for="c_name">Course name</label><input id="c_name" class="input" maxlength="120" placeholder="Financial Accounting I" value="${esc(c?.name ?? "")}"></div></div>
         <div class="row"><div class="field"><label for="c_prog">Programme</label><select id="c_prog" class="input">${options(L.programmes, { placeholder: "Select…", selected: c?.programme_id })}</select></div>
-          <div class="field"><label for="c_level">Academic level</label><select id="c_level" class="input">${options(L.levels, { placeholder: "Select…", selected: c?.level_id })}</select></div></div>
-        <div class="row"><div class="field"><label for="c_group">Class / group</label><select id="c_group" class="input"></select></div>
-          <div class="field"><label for="c_period">Academic period</label><select id="c_period" class="input">${options(L.periods, { placeholder: "None", selected: c?.academic_period_id })}</select></div></div>
+          <div class="field"><label for="c_group">Class</label><select id="c_group" class="input"></select></div></div>
+        <div class="row"><div class="field"><label for="c_period">Academic period</label><select id="c_period" class="input">${options(L.periods, { placeholder: "None", selected: c?.academic_period_id })}</select></div></div>
         <div class="err" id="cerr" role="alert"></div>
         <div class="actions"><button type="button" class="btn" data-close>Cancel</button><button class="btn primary" id="csave"><span class="lbl">${c ? "Save changes" : "Add course"}</span></button></div></form>`);
     const el = m.el;
     const fill = (keep) => {
-      const p = $("#c_prog", el).value, l = $("#c_level", el).value;
-      const list = L.groups.filter((g) => g.programme_id === p && g.level_id === l);
-      $("#c_group", el).innerHTML = `<option value="">All groups</option>` + options(list, { selected: keep });
+      const p = $("#c_prog", el).value;
+      const list = L.groups.filter((g) => g.programme_id === p);
+      $("#c_group", el).innerHTML = options(list, { placeholder: p ? (list.length ? "Select class…" : "No classes for this programme") : "Choose programme first", selected: keep });
     };
     fill(c?.class_group_id);
-    $("#c_prog", el).addEventListener("change", () => fill()); $("#c_level", el).addEventListener("change", () => fill());
+    $("#c_prog", el).addEventListener("change", () => fill());
     $("[data-close]", el).addEventListener("click", m.close);
     $("#cf", el).addEventListener("submit", async (e) => {
       e.preventDefault();
       const err = $("#cerr", el); err.textContent = "";
       const row = { code: $("#c_code", el).value.trim().toUpperCase().replace(/\s+/g, ""), name: $("#c_name", el).value.trim(),
-        programme_id: $("#c_prog", el).value, level_id: $("#c_level", el).value, class_group_id: $("#c_group", el).value || null, academic_period_id: $("#c_period", el).value || null };
+        programme_id: $("#c_prog", el).value, class_group_id: $("#c_group", el).value || null, academic_period_id: $("#c_period", el).value || null };
       if (!/^[A-Z0-9\-]{2,20}$/.test(row.code)) return (err.textContent = "Enter a course code (letters and numbers, e.g. ACC101).");
       if (row.name.length < 2) return (err.textContent = "Enter the course name.");
-      if (!row.programme_id || !row.level_id) return (err.textContent = "Choose a programme and a level.");
+      if (!row.programme_id || !row.class_group_id) return (err.textContent = "Choose the programme and the class this course is for.");
+      row.level_id = (L.groups.find((g) => g.id === row.class_group_id) || {}).level_id;
       setBusy($("#csave", el), true, "Saving…");
       const { error } = await q(c ? sb.from("courses").update(row).eq("id", c.id) : sb.from("courses").insert(row));
       setBusy($("#csave", el), false);
@@ -155,11 +155,11 @@ export async function mount(ctx, root) {
       const r = await call(sb, "admin_list_students", { p_query: v, p_status: "active", p_limit: 8 });
       if (!r.ok) { out.innerHTML = `<div class="notice bad">${esc(r.message)}</div>`; return; }
       const have = new Set(enrolled.map((e) => e.student_id));
-      out.innerHTML = r.rows.length ? r.rows.map((s) => `<div class="feed-row"><span><b>${esc(s.full_name)}</b> <span class="muted">${esc(s.student_id)} · ${esc(s.programme)} ${esc(s.level)} ${esc(s.class_group)}</span></span>${have.has(s.id) ? '<span class="badge good">enrolled</span>' : `<button class="btn small primary" data-add="${esc(s.id)}">Enrol</button>`}</div>`).join("") : '<div class="muted">No active student found.</div>';
+      out.innerHTML = r.rows.length ? r.rows.map((s) => `<div class="feed-row"><span><b>${esc(s.full_name)}</b> <span class="muted">${esc(s.student_id)} · ${esc(s.class_group)}</span></span>${have.has(s.id) ? '<span class="badge good">enrolled</span>' : `<button class="btn small primary" data-add="${esc(s.id)}">Enrol</button>`}</div>`).join("") : '<div class="muted">No active student found.</div>';
       $$("[data-add]", out).forEach((b) => b.addEventListener("click", async () => { const n = await enrolIds([b.dataset.add]); if (n >= 0) { toast("Student enrolled.", "good"); await refresh(); ev.target.dispatchEvent(new Event("input")); } }));
     }, 350));
     $("#e_all", el).addEventListener("click", async (ev) => {
-      const ok = await confirmDialog({ title: "Enrol all matching students?", body: `Enrols every active ${nameOf(L.programmes, c.programme_id)} ${nameOf(L.levels, c.level_id)} student${c.class_group_id ? ` in ${nameOf(L.groups, c.class_group_id)}` : ""} who isn't enrolled yet.`, confirmText: "Enrol them all" });
+      const ok = await confirmDialog({ title: "Enrol all matching students?", body: `Enrols every active student${c.class_group_id ? ` in ${nameOf(L.groups, c.class_group_id)}` : ` in ${nameOf(L.programmes, c.programme_id)} ${nameOf(L.levels, c.level_id)}`} who isn't enrolled yet.`, confirmText: "Enrol them all" });
       if (!ok) return;
       setBusy(ev.currentTarget, true);
       const r = await call(sb, "admin_list_students", { p_programme: c.programme_id, p_level: c.level_id, p_class_group: c.class_group_id, p_status: "active", p_limit: 5000 });

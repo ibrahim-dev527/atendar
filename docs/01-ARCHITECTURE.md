@@ -279,3 +279,7 @@ Honest caveat: IPs on campus Wi-Fi are shared (NAT), so limits are deliberately 
 2. **Dashboard access = Student ID + last 4 digits of WhatsApp.** The brief says "identify with student ID" only; I added the second factor because a bare ID would expose full attendance histories to anyone. Tell me if you would rather keep ID-only (not recommended).
 3. **Late rule:** a session can optionally set `late_after_minutes`; submissions after that point are recorded as `late` (and count as attended). Off by default.
 4. **Auto-enrolment on registration** into matching courses: on by default.
+
+
+---
+**Update 2026-11-22:** `class_groups` is presented as **Classes** (a programme has many classes, each with a level; students pick programme then class; courses belong to a class). `student_login(student_id)` now needs only the Student ID. Starter data: programme *Accounting and Finance Analytics*, class *BTech Accounting and Finance Analytics Lvl 100*.

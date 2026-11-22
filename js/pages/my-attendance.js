@@ -1,7 +1,7 @@
 import { initChrome, renderFooter, esc, toast, setBusy, ringHtml, animateRings, countUp, fmtDate, statusBadge, emptyState, $, $$ } from "/js/ui.js";
 import { isConfigured, studentClient } from "/js/supabase.js";
 import { call } from "/js/api.js";
-import { normalizeStudentId } from "/js/validators.js";
+import { normalizeStudentId, validStudentId } from "/js/validators.js";
 
 initChrome();
 renderFooter($("#app"));
@@ -23,7 +23,7 @@ async function logout(msg) {
   $("#dashView").classList.add("hidden"); $("#dashView").innerHTML = "";
   $("#logout").classList.add("hidden");
   $("#loginView").classList.remove("hidden");
-  $("#sid").value = ""; $("#l4").value = "";
+  $("#sid").value = "";
   if (msg) toast(msg, "info", 6000);
 }
 $("#logout").addEventListener("click", () => logout("You have been signed out. Your information is no longer on this screen."));
@@ -33,11 +33,10 @@ $("#loginForm").addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!sb) return;
   const err = $("#loginErr"); err.textContent = "";
-  const sid = normalizeStudentId($("#sid").value), l4 = $("#l4").value.trim();
-  if (sid.length < 4) { err.textContent = "Enter your Student ID."; return; }
-  if (!/^\d{4}$/.test(l4)) { err.textContent = "Enter exactly the last 4 digits of your WhatsApp number."; return; }
+  const sid = normalizeStudentId($("#sid").value);
+  if (!validStudentId(sid)) { err.textContent = "Enter your Student ID."; return; }
   setBusy($("#loginBtn"), true, "Checking…");
-  const r = await call(sb, "student_login", { p_student_id: sid, p_last4: l4 });
+  const r = await call(sb, "student_login", { p_student_id: sid });
   setBusy($("#loginBtn"), false);
   if (!r.ok) { err.textContent = r.message; toast(r.message, "bad"); return; }
   setToken(r.token);

@@ -50,7 +50,7 @@ async function toPdf(o, name) {
     didDrawPage: (d) => {
       const H = doc.internal.pageSize.getHeight();
       doc.setFontSize(8); doc.setTextColor(120);
-      doc.text("Powered by Ibratechh · ibratechh.com", 36, H - 18);
+      doc.text("Powered by Ibratechh · Ibrahim Mohammed Lotsu, ATUAS PRO · WhatsApp 0544823484 · ibratechh.com", 36, H - 18);
       doc.text(`Page ${d.pageNumber}`, W - 36, H - 18, { align: "right" });
     },
   });
@@ -68,7 +68,7 @@ async function toXlsx(o, name) {
   const headerRow = aoa.length;
   aoa.push(o.columns.map((c) => c.label));
   o.rows.forEach((r) => aoa.push(o.columns.map((c) => r[c.key] ?? "")));
-  aoa.push([], ["Powered by Ibratechh · https://ibratechh.com"]);
+  aoa.push([], ["Powered by Ibratechh · Ibrahim Mohammed Lotsu, ATUAS PRO · WhatsApp 0544823484 · https://ibratechh.com"]);
   const ws = X.utils.aoa_to_sheet(aoa); // values are written as typed cells, never as formulas
   ws["!cols"] = o.columns.map((c) => ({ wch: Math.min(40, Math.max(c.label.length + 2, ...o.rows.slice(0, 200).map((r) => text(r[c.key]).length + 2))) }));
   ws["!autofilter"] = { ref: X.utils.encode_range({ s: { r: headerRow, c: 0 }, e: { r: headerRow + o.rows.length, c: o.columns.length - 1 } }) };
@@ -100,7 +100,7 @@ async function toDocx(o, name) {
       ...o.rows.map((r) => new D.TableRow({ children: o.columns.map((c) => cell(r[c.key], { w })) }))],
   }));
   if (!o.rows.length) kids.push(new D.Paragraph({ children: [new D.TextRun({ text: "No records match the selected filters.", italics: true })] }));
-  kids.push(new D.Paragraph({ children: [new D.TextRun({ text: "Powered by Ibratechh · https://ibratechh.com", size: 16, color: "777777" })], spacing: { before: 240 } }));
+  kids.push(new D.Paragraph({ children: [new D.TextRun({ text: "Powered by Ibratechh · Ibrahim Mohammed Lotsu, ATUAS PRO · WhatsApp 0544823484 · https://ibratechh.com", size: 16, color: "777777" })], spacing: { before: 240 } }));
   const doc = new D.Document({ creator: "Atendar", title: o.title, sections: [{ children: kids }] });
   download(await D.Packer.toBlob(doc), `${name}.docx`);
 }

@@ -9,7 +9,30 @@
   <link rel="icon" href="/assets/favicon.png" type="image/png">
   <link rel="apple-touch-icon" href="/assets/logo-192.png">
   <link rel="stylesheet" href="/css/theme.css">
-  <link rel="stylesheet" href="/css/attend.css">
+  <style>
+.att-head { text-align: center; margin-bottom: 10px; }
+.att-head .code { display: inline-block; padding: 4px 12px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); font: 700 .8rem var(--font-head); color: var(--cyan); letter-spacing: .06em; margin-bottom: 8px; }
+.att-head h3 { font-size: 1.3rem; margin-bottom: 4px; }
+.cd { position: relative; width: 132px; height: 132px; margin: 12px auto 18px; }
+.cd svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.cd circle { fill: none; stroke-width: 9; stroke-linecap: round; }
+.cd .t { stroke: rgba(255,255,255,.1); }
+.cd .b { stroke: var(--green); transition: stroke-dashoffset 1s linear, stroke .5s; }
+.cd.low .b { stroke: var(--amber); } .cd.crit .b { stroke: var(--red); }
+.cd.crit { animation: shakeY .6s infinite; }
+.cd .num { position: absolute; inset: 0; display: grid; place-content: center; text-align: center; }
+.cd .num b { font: 800 2rem var(--font-head); font-variant-numeric: tabular-nums; }
+.cd .num span { font-size: .7rem; color: var(--muted); text-transform: uppercase; letter-spacing: .1em; }
+.id-input { font: 700 1.4rem var(--font-head) !important; text-align: center; letter-spacing: .08em; text-transform: uppercase; padding: 16px !important; }
+.whoami { text-align: center; padding: 22px 14px; border-radius: 20px; margin: 6px 0 18px; background: linear-gradient(135deg, rgba(124,92,255,.18), rgba(34,211,238,.14)); border: 1px solid rgba(124,92,255,.4); animation: pop .5s var(--ease); }
+.whoami small { display: block; color: var(--muted); text-transform: uppercase; letter-spacing: .12em; font-size: .72rem; margin-bottom: 6px; }
+.whoami b { font: 800 1.55rem var(--font-head); line-height: 1.2; display: block; word-break: break-word; }
+.whoami span { color: var(--muted); font-size: .85rem; }
+.stack { display: grid; gap: 10px; }
+.big-icon { font-size: 3.2rem; display: block; margin-bottom: 8px; animation: floaty 3.5s ease-in-out infinite; }
+.pane-enter { animation: pane .45s var(--ease); }
+@keyframes pane { from { opacity: 0; transform: translateX(26px); } }
+  </style>
 </head>
 <body>
   <main class="shell narrow" id="app">

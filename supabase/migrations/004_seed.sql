@@ -19,17 +19,17 @@ insert into public.app_settings (key, value) values
 on conflict (key) do nothing;
 
 insert into public.programmes (code, name, department) values
-  ('ACC', 'Accounting', 'Accounting and Finance')
+  ('AFA', 'Accounting and Finance Analytics', 'Accounting and Finance')
 on conflict (code) do nothing;
 
 insert into public.academic_levels (level_number, name) values
   (100, 'Level 100'), (200, 'Level 200'), (300, 'Level 300'), (400, 'Level 400')
 on conflict (level_number) do nothing;
 
--- Placeholder group so registration works on day one. Rename it or add your
--- real class groups in the dashboard before sharing the registration link.
+-- First class, so registration works on day one. Add more programmes and classes
+-- (BTech / HND / Diploma, Level 100-400) in Admin -> Setup.
 insert into public.class_groups (programme_id, level_id, name)
-select p.id, l.id, 'Group A'
+select p.id, l.id, 'BTech Accounting and Finance Analytics Lvl 100'
 from public.programmes p, public.academic_levels l
-where p.code = 'ACC' and l.level_number = 100
+where p.code = 'AFA' and l.level_number = 100
 on conflict do nothing;
