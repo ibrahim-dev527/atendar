@@ -1,9 +1,10 @@
-import { initChrome, renderFooter, openModal, esc, toast, $ } from "/js/ui.js";
+import { initChrome, renderFooter, openModal, esc, toast, setBusy, $ } from "/js/ui.js";
 import { isConfigured, studentClient } from "/js/supabase.js";
 import { call } from "/js/api.js";
 
 initChrome();
 renderFooter($("#app"));
+const sb = isConfigured ? studentClient() : null;
 if (!isConfigured) $("#cfgWarn").classList.remove("hidden");
 
 // typewriter
@@ -30,14 +31,25 @@ if (isConfigured) {
 $("#markBtn").addEventListener("click", () => {
   const m = openModal(`
     <h3>📲 Mark attendance</h3>
-    <p class="muted">Scan the QR code your lecturer is showing with your phone camera, or paste the attendance link here.</p>
-    <div class="field"><label for="lnk">Attendance link</label><input id="lnk" class="input" placeholder="https://…/attend.html?s=…" autocomplete="off"><div class="err" id="lnkErr"></div></div>
+    <p class="muted">Scan the QR code your lecturer or course rep is showing with your phone camera, <b>or</b> type the 6-character class code they mention, <b>or</b> paste the attendance link.</p>
+    <div class="field"><label for="lnk">Class code or attendance link</label><input id="lnk" class="input" placeholder="e.g. K7M2QX  or  https://…/attend.html?s=…" autocomplete="off" autocapitalize="characters" spellcheck="false"><div class="err" id="lnkErr"></div></div>
     <div class="actions"><button class="btn" data-close>Cancel</button><button class="btn primary" id="go"><span class="lbl">Continue</span></button></div>`);
-  const go = () => {
+  const go = async () => {
     const v = $("#lnk", m.el).value.trim();
+    const err = $("#lnkErr", m.el); err.textContent = "";
+    const codeOnly = v.replace(/[\s-]/g, "");
+    if (/^[A-Za-z0-9]{6}$/.test(codeOnly) && !/^[a-f0-9]{48}$/i.test(v)) {
+      if (!sb) { err.textContent = "The site isn't connected to the database yet."; return; }
+      setBusy($("#go", m.el), true, "Checking…");
+      const r = await call(sb, "resolve_join_code", { p_code: codeOnly });
+      setBusy($("#go", m.el), false);
+      if (!r.ok) { err.textContent = r.message; return; }
+      location.href = `/attend.html?s=${encodeURIComponent(r.token)}`;
+      return;
+    }
     let token = null;
     try { token = new URL(v).searchParams.get("s"); } catch { if (/^[a-f0-9]{48}$/i.test(v)) token = v; }
-    if (!token || !/^[A-Za-z0-9_-]{20,128}$/.test(token)) { $("#lnkErr", m.el).textContent = "That doesn't look like an attendance link. Ask your lecturer to share it again."; return; }
+    if (!token || !/^[A-Za-z0-9_-]{20,128}$/.test(token)) { $("#lnkErr", m.el).textContent = "That doesn't look like a class code or attendance link. Ask your lecturer or course rep for the code again."; return; }
     location.href = `/attend.html?s=${encodeURIComponent(token)}`;
   };
   $("#go", m.el).addEventListener("click", go);

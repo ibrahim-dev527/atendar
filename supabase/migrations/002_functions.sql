@@ -487,6 +487,20 @@ end $$;
 -- ----------------------------------------------------------------------------
 -- Attendance sessions (staff)
 -- ----------------------------------------------------------------------------
+create or replace function public._new_join_code()
+returns text language plpgsql volatile set search_path = '' as $$
+declare v text; i int; alphabet constant text := 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+begin
+  loop
+    v := '';
+    for i in 1..6 loop
+      v := v || substr(alphabet, 1 + floor(random() * length(alphabet))::int, 1);
+    end loop;
+    exit when not exists (select 1 from public.attendance_sessions where join_code = v);
+  end loop;
+  return v;
+end $$;
+
 create or replace function public.create_session(
   p_course uuid, p_title text, p_date date, p_start time, p_duration int,
   p_code text default null, p_late_after int default null)
@@ -510,9 +524,9 @@ begin
   end if;
 
   insert into public.attendance_sessions
-    (course_id, title, session_date, scheduled_start, duration_minutes, attendance_code, late_after_minutes, created_by)
+    (course_id, title, session_date, scheduled_start, duration_minutes, attendance_code, late_after_minutes, created_by, join_code)
   values (p_course, btrim(p_title), coalesce(p_date, current_date), p_start, p_duration,
-          nullif(p_code, ''), p_late_after, (select auth.uid()))
+          nullif(p_code, ''), p_late_after, (select auth.uid()), public._new_join_code())
   returning id, public_token into v_id, v_token;
 
   perform public._audit('session.create', 'attendance_session', v_id::text, null,
@@ -658,6 +672,21 @@ begin
     'course_name', c.name, 'course_code', c.code, 'title', s.title,
     'requires_code', s.attendance_code is not null,
     'seconds_remaining', case when v_eff = 'open' then greatest(0, ceil(extract(epoch from (s.closes_at - now())))::int) else 0 end);
+end $$;
+
+-- Student typed the short class code instead of scanning the QR: return the session link token.
+create or replace function public.resolve_join_code(p_code text)
+returns jsonb language plpgsql security definer set search_path = '' as $$
+declare v text := upper(regexp_replace(coalesce(p_code, ''), '[^A-Za-z0-9]', '', 'g')); s public.attendance_sessions;
+begin
+  if not public._rate_ok('join_code', public._client_key(), public._setting('rl_lookup_max', '400')::int, 300) then
+    return jsonb_build_object('ok', false, 'code', 'RATE_LIMITED', 'message', 'Too many attempts. Please wait a moment.');
+  end if;
+  select * into s from public.attendance_sessions where join_code = v;
+  if v !~ '^[A-Z0-9]{6}$' or not found then
+    return jsonb_build_object('ok', false, 'code', 'CODE_NOT_FOUND', 'message', 'We could not find a session with that code. Check it with your lecturer or course rep.');
+  end if;
+  return jsonb_build_object('ok', true, 'token', s.public_token);
 end $$;
 
 -- Step 1: student types their ID; we return the REGISTERED name to confirm.

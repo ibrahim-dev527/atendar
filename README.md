@@ -30,7 +30,7 @@ Then in Supabase **Authentication → URL Configuration** set the Site URL to yo
 
 ## Updating a project that already ran an older setup.sql
 
-Run `supabase/update_2026-11-22.sql` once in the SQL Editor (safe to re-run). New projects only need `setup.sql`.
+Run `supabase/update_2026-11-22.sql` once (it also adds the class codes) in the SQL Editor (safe to re-run). New projects only need `setup.sql`.
 
 ## 4. First use
 
@@ -41,8 +41,14 @@ Run `supabase/update_2026-11-22.sql` once in the SQL Editor (safe to re-run). Ne
 4. Share `/register.html` with students. Students register themselves.
 5. **Sessions → New session → Start**. Share the link / show the QR. **Students can register at any time, even while a session is running: they join that session's class list automatically, so totals always add up. Sessions that have already closed are never changed.
 
-Optional: invite more staff from the dashboard by deploying the Edge Function:
-`supabase functions deploy invite-staff` (uses the service-role key **server-side only**, provided automatically by Supabase).
+### Adding staff (two ways)
+
+**A. Without the invite function (simplest):** Supabase → Authentication → Users → Add user (email + password, tick Auto Confirm). Then in Atendar → Staff, find them and tap **Change role**. Finally assign them to courses in Courses.
+
+**B. Invite by email (optional):** deploy the Edge Function once. In Supabase → Edge Functions → *Deploy a new function* → *Via Editor*, name it exactly `invite-staff`, paste the contents of `supabase/functions/invite-staff/index.ts`, and Deploy. (Or with the CLI: `supabase functions deploy invite-staff`.) It uses the service-role key **server-side only**, provided automatically by Supabase. Until it is deployed, the Invite button shows an explanation and you use way A.
+
+### Class code
+Every session gets a 6-character **class code** (shown beside the QR in the live monitor and the projector view). Students can tap *Mark Attendance* on the home page and type that code instead of scanning the QR or pasting the link. It is separate from the optional *Attendance code*, an extra secret the lecturer can require on top.
 
 ## Honest limitations
 

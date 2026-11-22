@@ -252,3 +252,10 @@ table.tbl { width: 100%; border-collapse: collapse; min-width: 640px; font-size:
 .dev a.dev-wa { display: inline-flex; align-items: center; gap: 6px; margin-top: 4px; padding: 6px 14px; border-radius: 999px; font-size: .9rem; font-weight: 700;
   color: #052e16; -webkit-text-fill-color: #052e16; background: #25d366; box-shadow: 0 4px 16px rgba(37, 211, 102, .35); transition: transform .2s, box-shadow .2s; }
 .dev a.dev-wa:hover { transform: translateY(-2px); box-shadow: 0 8px 22px rgba(37, 211, 102, .5); filter: none; }
+
+.dev-photo-btn { background: none; border: 0; padding: 0; cursor: zoom-in; border-radius: 50%; line-height: 0; transition: transform .25s var(--ease); }
+.dev-photo-btn:hover { transform: scale(1.06); }
+.dev-photo-btn:focus-visible { outline: 3px solid var(--cyan, #22d3ee); outline-offset: 3px; }
+.modal.photo-modal { max-width: min(92vw, 560px); padding: 14px; text-align: center; }
+.photo-view img { display: block; width: 100%; max-height: 72vh; object-fit: contain; border-radius: 14px; }
+.photo-view p { margin: 12px 0; }

@@ -173,6 +173,7 @@ grant execute on function
   public.get_public_config(),
   public.register_student(text, text, text, uuid, uuid, uuid),
   public.get_session_public(text),
+  public.resolve_join_code(text),
   public.lookup_student_for_session(text, text),
   public.submit_attendance(text, text, text, text),
   public.student_login(text),

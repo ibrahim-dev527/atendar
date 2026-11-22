@@ -56,7 +56,7 @@ export async function mount(ctx, root) {
       setBusy($("#i_go", m.el), true, "Sending…");
       try {
         const { data, error } = await sb.functions.invoke("invite-staff", { body });
-        if (error || !data?.ok) { let msg = data?.message; if (!msg && error?.context?.json) { try { msg = (await error.context.json())?.message; } catch {} } err.textContent = msg || "Couldn't send the invitation. Has the invite-staff function been deployed? (See README.)"; return; }
+        if (error || !data?.ok) { let msg = data?.message; if (!msg && error?.context?.json) { try { msg = (await error.context.json())?.message; } catch {} } err.textContent = msg || "The invitation could not be sent because the invite function isn't set up on Supabase yet. You can still add this person: in Supabase go to Authentication → Users → Add user, then come back to this page, find them in the list and use Change role."; return; }
         toast("Invitation sent.", "good"); m.close(); load();
       } catch { err.textContent = "Couldn't reach the server. Please try again."; }
       finally { setBusy($("#i_go", m.el), false); }

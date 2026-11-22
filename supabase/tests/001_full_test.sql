@@ -371,4 +371,22 @@ begin
   perform t.root();
   update public.app_settings set value='100000' where key='rl_lookup_max';
 end $$;
+-- -------------------------------------------------------------- class (join) code
+do $$
+declare r jsonb; tok text; jc text;
+begin
+  perform t.root();
+  select public_token, join_code into tok, jc from public.attendance_sessions limit 1;
+  perform t.ok(jc ~ '^[A-Z2-9]{6}$', 'every session gets a 6-character class code');
+  perform t.ok((select count(distinct join_code) = count(*) from public.attendance_sessions), 'class codes are unique');
+  perform t.anon('5.5.5.5');
+  r := public.resolve_join_code(lower(substr(jc,1,3) || ' ' || substr(jc,4)));
+  perform t.ok(r->>'ok'='true' and r->>'token'=tok, 'typing the class code (any case, spaces ok) returns the session link token');
+  r := public.resolve_join_code('AAAAAA');
+  perform t.ok(r->>'code'='CODE_NOT_FOUND', 'wrong class code rejected');
+  r := public.resolve_join_code(null);
+  perform t.ok(r->>'code'='CODE_NOT_FOUND', 'empty class code rejected');
+  perform t.root();
+end $$;
+
 select 'ALL DATABASE TESTS PASSED' as result;

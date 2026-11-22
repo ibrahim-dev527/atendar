@@ -171,7 +171,8 @@ function showEnded(code, message) {
   const text = message || (closed ? "This attendance session has been closed by your lecturer." : "This attendance session has expired.");
   const html = `<div style="text-align:center"><svg class="check bad" viewBox="0 0 80 80" aria-hidden="true"><circle cx="40" cy="40" r="30"/><path d="M29 29l22 22M51 29L29 51"/></svg>
     <h2>${closed ? "Session closed" : "Time's up"}</h2><p class="muted">${esc(text)}</p>
-    <p class="muted">Missed it? Speak to your lecturer or the system administrator.</p><button class="btn" data-close>Close</button></div>`;
+    <div class="notice warn" style="text-align:left;margin:12px 0"><span>🗣️</span><span><b>Had a problem marking your attendance?</b> Tell your course rep or lecturer about the issue <b>before the lecturer leaves the class</b>, so it can be sorted out while everyone is still here.</span></div>
+    <p class="muted">Still stuck afterwards? Contact the system administrator.</p><button class="btn" data-close>Close</button></div>`;
   if (!modal) modal = openModal('<div id="pane"></div>', { onClose: () => { modal = null; } });
   show(html);
   $("[data-close]", modal.el)?.addEventListener("click", () => modal?.close());

@@ -190,6 +190,8 @@ create table public.attendance_sessions (
   late_after_minutes int  check (late_after_minutes is null or late_after_minutes > 0),
   -- Unguessable link token (192 bits). This, not the row id, is what goes in the URL/QR.
   public_token       text not null unique default encode(extensions.gen_random_bytes(24), 'hex'),
+  -- Short spoken code (e.g. K7M2QX): students can type it instead of scanning the QR / opening the link.
+  join_code          text unique check (join_code is null or join_code ~ '^[A-Z0-9]{6}$'),
   status             text not null default 'scheduled' check (status in ('scheduled','open','closed','expired')),
   opens_at           timestamptz,
   closes_at          timestamptz,

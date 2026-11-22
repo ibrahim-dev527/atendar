@@ -25,7 +25,7 @@ async function list(ctx, root) {
     else { const { data: as } = await q(sb.from("course_assignments").select("course_id,can_create_sessions").eq("user_id", ctx.user.id)); manageable = new Set((as || []).filter((a) => a.can_create_sessions).map((a) => a.course_id)); }
     $("#fCourse", root).innerHTML = '<option value="">All courses</option>' + courses.map((c) => `<option value="${esc(c.id)}">${esc(c.code)} · ${esc(c.name)}</option>`).join("");
     $("#fCourse", root).value = filter;
-    let qb = sb.from("attendance_sessions").select("id,title,session_date,scheduled_start,duration_minutes,attendance_code,status,opens_at,closes_at,public_token,course_id,courses(code,name)").order("created_at", { ascending: false }).limit(150);
+    let qb = sb.from("attendance_sessions").select("id,title,session_date,scheduled_start,duration_minutes,attendance_code,join_code,status,opens_at,closes_at,public_token,course_id,courses(code,name)").order("created_at", { ascending: false }).limit(150);
     if (filter) qb = qb.eq("course_id", filter);
     const { data, error } = await q(qb);
     if (error) { $("#table", root).innerHTML = `<div class="notice bad">${esc(error)}</div>`; return; }
@@ -132,7 +132,7 @@ async function monitor(ctx, root, id) {
   let expiring = false;
   root.innerHTML = `<div class="skeleton" style="height:120px;margin-bottom:12px"></div><div class="skeleton" style="height:300px"></div>`;
 
-  const { data, error } = await q(sb.from("attendance_sessions").select("id,title,session_date,duration_minutes,attendance_code,status,opens_at,closes_at,public_token,late_after_minutes,course_id,courses(code,name)").eq("id", id).single());
+  const { data, error } = await q(sb.from("attendance_sessions").select("id,title,session_date,duration_minutes,attendance_code,join_code,status,opens_at,closes_at,public_token,late_after_minutes,course_id,courses(code,name)").eq("id", id).single());
   if (error || !data) { root.innerHTML = `<div class="card">${emptyState("🔍", "Session not found", "It may have been removed, or you may not have access to it.")}<div style="text-align:center"><a class="btn" href="#/sessions">← Back to sessions</a></div></div>`; return {}; }
   sess = data;
   if (!isAdmin) { const { data: as } = await q(sb.from("course_assignments").select("can_create_sessions").eq("course_id", sess.course_id).eq("user_id", ctx.user.id)); canManage = !!as?.[0]?.can_create_sessions; }
@@ -155,7 +155,8 @@ async function monitor(ctx, root, id) {
     $("#left", root).innerHTML = `
       ${st === "open" ? `<div class="big-timer" id="bigT">${mmss(remaining())}</div><div class="muted" style="margin-bottom:10px">time left to mark attendance</div>` : `<div class="muted" style="margin-bottom:10px">${st === "scheduled" ? "Not started yet" : st === "closed" ? "Session closed" : "Session expired"}</div>`}
       <img id="qrImg" alt="QR code for the attendance link" ${qrUrl ? `src="${qrUrl}"` : ""}>
-      ${sess.attendance_code ? `<div style="margin-top:12px"><div class="muted" style="font-size:.78rem">ATTENDANCE CODE</div><div style="font:800 2rem var(--font-head);letter-spacing:.2em" class="gradient-text">${esc(sess.attendance_code)}</div></div>` : ""}
+      ${sess.join_code ? `<div style="margin-top:12px"><div class="muted" style="font-size:.78rem">CLASS CODE (students can type this instead of scanning)</div><div style="font:800 2.2rem var(--font-head);letter-spacing:.25em" class="gradient-text">${esc(sess.join_code)}</div></div>` : ""}
+      ${sess.attendance_code ? `<div style="margin-top:12px"><div class="muted" style="font-size:.78rem">ATTENDANCE CODE (extra code students must also enter)</div><div style="font:800 2rem var(--font-head);letter-spacing:.2em" class="gradient-text">${esc(sess.attendance_code)}</div></div>` : ""}
       <div class="link-box"><input class="input" readonly value="${esc(link)}" id="linkIn" aria-label="Attendance link"><button class="btn" id="copyBtn">Copy</button></div>
       <div style="display:grid;gap:8px;margin-top:12px"><button class="btn" id="projBtn">🖥️ Show on projector</button></div>`;
     paintQr();
@@ -223,7 +224,7 @@ async function monitor(ctx, root, id) {
     if (prev !== st) { await reload(); }
     paintRight(); tickPaint();
   }
-  async function reload() { const { data: d } = await q(sb.from("attendance_sessions").select("id,title,session_date,duration_minutes,attendance_code,status,opens_at,closes_at,public_token,late_after_minutes,course_id,courses(code,name)").eq("id", id).single()); if (d) sess = d; paintLeft(); const l = $("#left", root); if (l) l.dataset.st = sum?.status || effStatus(sess); }
+  async function reload() { const { data: d } = await q(sb.from("attendance_sessions").select("id,title,session_date,duration_minutes,attendance_code,join_code,status,opens_at,closes_at,public_token,late_after_minutes,course_id,courses(code,name)").eq("id", id).single()); if (d) sess = d; paintLeft(); const l = $("#left", root); if (l) l.dataset.st = sum?.status || effStatus(sess); }
   async function full() { await data_(); await reload(); paintLeft(); paintRight(); }
 
   function tickPaint() {
@@ -238,6 +239,7 @@ async function monitor(ctx, root, id) {
     if (proj) return;
     proj = document.createElement("div"); proj.className = "proj";
     proj.innerHTML = `<div><h2>${esc(sess.courses?.code)} · ${esc(sess.title)}</h2><p class="muted" style="font-size:1.2rem">Scan to mark attendance</p><img src="${qrUrl}" alt="QR code">
+      ${sess.join_code ? `<div class="muted" style="margin-top:14px">CLASS CODE: open Atendar, tap Mark Attendance, type</div><div class="big-code">${esc(sess.join_code)}</div>` : ""}
       ${sess.attendance_code ? `<div class="muted" style="margin-top:14px">ATTENDANCE CODE</div><div class="big-code">${esc(sess.attendance_code)}</div>` : ""}
       <div class="big-timer" id="pT" style="font-size:clamp(2rem,6vw,4rem)">${mmss(remaining())}</div><button class="btn" id="pClose">✕ Close</button></div>`;
     document.body.appendChild(proj);

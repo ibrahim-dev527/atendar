@@ -49,7 +49,7 @@ export function renderFooter(container = document.body) {
   const wa = "https://wa.me/233544823484?text=" + encodeURIComponent("Hello Ibrahim, I'm contacting you from the Atendar attendance platform (powered by Ibratechh). I need some help / have an enquiry.");
   f.innerHTML = `
     <div class="dev">
-      <img class="dev-photo" src="/assets/developer.jpg" alt="Photo of Ibrahim Mohammed Lotsu" width="72" height="72" loading="lazy">
+      <button type="button" class="dev-photo-btn" id="devPhotoBtn" aria-label="View Ibrahim's photo full size"><img class="dev-photo" src="/assets/developer.jpg" alt="Photo of Ibrahim Mohammed Lotsu" width="72" height="72" loading="lazy"></button>
       <div class="dev-text">
         <span>Powered by <a href="https://ibratechh.com" target="_blank" rel="noopener noreferrer">Ibratechh</a></span>
         <span class="dev-name">Ibrahim Mohammed Lotsu &middot; ATUAS PRO</span>
@@ -58,6 +58,10 @@ export function renderFooter(container = document.body) {
     </div>
     <span>&middot; Atendar &copy; ${new Date().getFullYear()}</span>`;
   container.appendChild(f);
+  f.querySelector("#devPhotoBtn").addEventListener("click", () => {
+    const m = openModal(`<div class="photo-view"><img src="/assets/developer.jpg" alt="Ibrahim Mohammed Lotsu, full photo"><p><b>Ibrahim Mohammed Lotsu</b> &middot; ATUAS PRO<br><span class="muted">Powered by Ibratechh</span></p><button class="btn" data-close>Close</button></div>`);
+    m.el.classList.add("photo-modal");
+  });
   initReveal();
 }
 
